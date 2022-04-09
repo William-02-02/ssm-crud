@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" 
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://www.springframework.org/schema/context 
+       https://www.springframework.org/schema/context/spring-context.xsd 
+       http://www.springframework.org/schema/aop 
+       https://www.springframework.org/schema/aop/spring-aop.xsd 
+       http://www.springframework.org/schema/tx 
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	
+	
+	<!--Spring配置文件 这里主要配置和业务逻辑有关的-->
+	<!--数据源 事务控制-->
+	
+	
+	<!--1.关联数据库配置文件-->
+	<context:property-placeholder location="classpath:db.properties"></context:property-placeholder>
+	
+	
+	<!-- 自动扫描web包 ,将带有注解的类纳入spring容器管理 -->
+	<!--Spring 容器初始化的时候，会扫描 com.web 下标有
+		(@Component,@Service,@Repository) 注解的类,纳入spring容器管理 排除了Controller-->
+	<context:component-scan base-package="com.lyh">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	
+	<!--2.连接池 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"></property>
+		<property name="jdbcUrl" value="${jdbc.url}"></property>
+		<property name="user" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		
+		<!--存在一些数据源的配置 自行配置-->
+		<!--<property name="loginTimeout" value="10000"></property>-->
+		<!--<property name="autoCommitOnClose" value="false"></property>-->
+	</bean>
+	
+	
+	<!--配置和mybatis的整合-->
+	<!--sqlSessionFactory-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!--绑定mybatis的配置文件-->
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<!-- 指定mybatis，mapper文件的位置 -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+	</bean>
+	
+	
+	
+	<!--配置dao接口扫描包，动态地实现了Dao接口  并注入到Spring容器中-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!--注入sqlSessionFactory-->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		<!--要扫描的dao包-->
+		<property name="basePackage" value="com.lyh.dao"></property>
+	</bean>
+	
+	
+	<!--配置一个可以执行批量执行的sqlSession-->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+		<constructor-arg name="executorType" value="BATCH"></constructor-arg>
+	</bean>
+	
+	
+	
+	
+	
+	<!--=====================================================================================-->
+	
+	
+	<!--事务控制的配置-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!--控制数据源-->
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!--开启基于注解的事务/使用xml配置的事务 主要用xml-->
+	<aop:config>
+		<aop:pointcut id="txPoint" expression="execution(* com.lyh.service..*(..))"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"></aop:advisor>
+	</aop:config>
+	
+	<!--配置事务增强-->
+	<tx:advice id="txAdvice"> 
+		<tx:attributes>
+			<!--所有方法都是事务方法-->
+			<tx:method name="*"/>
+			<!--以get开始的方法 当作是查询-->
+			<tx:method name="get*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	
+	
+</beans>

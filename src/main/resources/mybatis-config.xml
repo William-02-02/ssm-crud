@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!--开启驼峰命名-->
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings>
+	
+	<!--配置数据源：交给Spring做-->
+	
+	<!--这个配置文件就： 取别名  配置mapper-->
+	
+	<!--自动用小写字母开头取别名-->
+	<typeAliases>
+		<package name="com.lyh.pojo"/>
+	</typeAliases>
+
+</configuration>
+
+
+
