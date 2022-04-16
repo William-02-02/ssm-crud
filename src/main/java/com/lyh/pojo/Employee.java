@@ -1,12 +1,18 @@
 package com.lyh.pojo;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+
 public class Employee {
     private Integer empId;
-
+    
+    @Pattern(regexp = "(^[a-zA-Z0-9_-]{6,16}$)|(^[\\u2E80-\\u9FFF]{2,5})",
+            message = "用户名可以是2-5位中文或者6-16位英文和数字的组合Employee")
     private String empName;
 
     private String gender;
 
+    @Email(message = "邮箱格式不正确Employee")
     private String email;
 
     private Integer dId;
@@ -70,5 +76,17 @@ public class Employee {
 
     public void setdId(Integer dId) {
         this.dId = dId;
+    }
+    
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "empId=" + empId +
+                ", empName='" + empName + '\'' +
+                ", gender='" + gender + '\'' +
+                ", email='" + email + '\'' +
+                ", dId=" + dId +
+                ", department=" + department +
+                '}';
     }
 }

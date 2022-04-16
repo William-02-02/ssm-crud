@@ -15,6 +15,10 @@ public interface EmployeeMapper {
     int insert(Employee row);
 
     int insertSelective(Employee row);
+    
+    List<Employee> selectByExampleWithDept(EmployeeExample example);
+    
+    Employee selectByPrimaryKeyWithDept(Integer empId);
 
     List<Employee> selectByExample(EmployeeExample example);
 

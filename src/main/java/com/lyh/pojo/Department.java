@@ -24,8 +24,17 @@ public class Department {
     public String getDeptName() {
         return deptName;
     }
-
+    
+    @Override
+    public String toString() {
+        return "Department{" +
+                "deptId=" + deptId +
+                ", deptName='" + deptName + '\'' +
+                '}';
+    }
+    
     public void setDeptName(String deptName) {
+        
         this.deptName = deptName == null ? null : deptName.trim();
     }
 }
